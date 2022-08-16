@@ -217,35 +217,6 @@ private:
         }
         return matched_documents;
     }
-
-    vector<Document> FindAllDocuments(const Query& query_words, DocumentStatus status) const {
-        map<int, double> document_to_relevance;
-        for (const string& word : query_words.plus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
-            }
-            for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                if (documents_.at(document_id).status == status) {
-                    const double IDF = log(static_cast<double>(document_count_) / word_to_document_freqs_.at(word).size());
-                    document_to_relevance[document_id] += IDF * term_freq;
-                }
-            }
-        }
-        for (const string& word : query_words.minus_words) {
-            if (word_to_document_freqs_.count(word) == 0) {
-                continue;
-            }
-            for (const auto& [document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                document_to_relevance.erase(document_id);
-            }
-        }
-
-        vector<Document> matched_documents;
-        for (const auto& [document_id, relevance] : document_to_relevance) {
-            matched_documents.push_back({ document_id, relevance, documents_.at(document_id).rating });
-        }
-        return matched_documents;
-    }
 };
 
 void PrintDocument(const Document& document) {
