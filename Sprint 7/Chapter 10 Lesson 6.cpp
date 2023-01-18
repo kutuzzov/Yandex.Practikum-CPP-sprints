@@ -26,20 +26,19 @@ TokenForwardIt FindSentenceEnd(TokenForwardIt tokens_begin, TokenForwardIt token
 // Класс Token имеет метод bool IsEndSentencePunctuation() const
 template <typename Token>
 vector<Sentence<Token>> SplitIntoSentences(vector<Token> tokens) {
-    vector<Sentence<Token>> result;
+    vector<Sentence<Token>> sentences;
     auto it_start = tokens.begin();
-    auto it_end = tokens.end();
-    auto it = tokens.begin();
-
-    while (it_start != it_end) {
-        auto it_token = FindSentenceEnd(it_start, it_end);
-        if (it == it_token) {
-            result.push_back({ make_move_iterator(it_start), make_move_iterator(it_token) });
-            it_start = it;
+    
+    while (it_start != tokens.end()){
+        const auto it_token = FindSentenceEnd(it_start, tokens.end());
+        Sentence<Token> sentence;
+        for (; it_start != it_token; ++it_start){
+            sentence.push_back(move(*it_start));
         }
-        ++it;
+        sentences.push_back(move(sentence));
     }
-    return result;
+    
+    return sentences;
 }
 
 struct TestToken {
