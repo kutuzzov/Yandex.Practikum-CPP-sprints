@@ -10,7 +10,10 @@ using namespace std;
 
 template <typename RandomIt>
 void MakeJosephusPermutation(RandomIt first, RandomIt last, uint32_t step_size) {
-    deque<typename RandomIt::value_type> pool(make_move_iterator(first), make_move_iterator(last));
+    deque<typename RandomIt::value_type> pool;
+    for (auto it = first; it < last; ++it) {
+        pool.push_back(move(*it));
+    }
     size_t cur_pos = 0;
     while (!pool.empty()) {
         *(first++) = move(pool[cur_pos]);
@@ -38,7 +41,7 @@ void TestIntVector() {
     {
         vector<int> numbers_copy = numbers;
         MakeJosephusPermutation(begin(numbers_copy), end(numbers_copy), 3);
-        assert(numbers_copy == vector<int>({0, 3, 6, 9, 4, 8, 5, 2, 7, 1}));
+        assert(numbers_copy == vector<int>({ 0, 3, 6, 9, 4, 8, 5, 2, 7, 1 }));
     }
 }
 
@@ -67,20 +70,20 @@ ostream& operator<<(ostream& os, const NoncopyableInt& v) {
 
 void TestAvoidsCopying() {
     vector<NoncopyableInt> numbers;
-    numbers.push_back({1});
-    numbers.push_back({2});
-    numbers.push_back({3});
-    numbers.push_back({4});
-    numbers.push_back({5});
+    numbers.push_back({ 1 });
+    numbers.push_back({ 2 });
+    numbers.push_back({ 3 });
+    numbers.push_back({ 4 });
+    numbers.push_back({ 5 });
 
     MakeJosephusPermutation(begin(numbers), end(numbers), 2);
 
     vector<NoncopyableInt> expected;
-    expected.push_back({1});
-    expected.push_back({3});
-    expected.push_back({5});
-    expected.push_back({4});
-    expected.push_back({2});
+    expected.push_back({ 1 });
+    expected.push_back({ 3 });
+    expected.push_back({ 5 });
+    expected.push_back({ 4 });
+    expected.push_back({ 2 });
 
     assert(numbers == expected);
 }
