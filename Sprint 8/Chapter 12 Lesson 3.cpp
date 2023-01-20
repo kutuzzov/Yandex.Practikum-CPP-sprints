@@ -34,7 +34,7 @@ void Test(string_view mark, string_view s, Solver solver) {
 #define TEST(solver) Test(#solver, s, solver)
 
 int CountWords(string_view str) {
-    return count(execution::par, str.begin(), str.end(), ' ') + 1;
+    return static_cast<int>(count(execution::par, str.begin(), str.end(), ' ')) + 1;
 }
 
 int main() {
