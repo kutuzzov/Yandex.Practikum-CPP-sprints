@@ -95,7 +95,7 @@ SearchServer::SearchServer(const StringContainer& stop_words)
     : stop_words_(MakeUniqueNonEmptyStrings(stop_words))
 {
     if (!all_of(stop_words_.begin(), stop_words_.end(), IsValidWord)) {
-        throw std::invalid_argument("слово содержит специальный символ"s);
+        throw std::invalid_argument("Г±Г«Г®ГўГ® Г±Г®Г¤ГҐГ°Г¦ГЁГІ Г±ГЇГҐГ¶ГЁГ Г«ГјГ­Г»Г© Г±ГЁГ¬ГўГ®Г«"s);
     }
 }
 
@@ -155,7 +155,7 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
 template <typename ExecutionPolicy>
 void SearchServer::RemoveDocument(ExecutionPolicy&& policy, int document_id) {
     if (document_to_word_freqs_.count(document_id)) {
-        const std::map<std::string, double>& word_freqs = document_to_word_freqs_.at(std::move(document_id));
+        const std::map<std::string, double>& word_freqs = document_to_word_freqs_.at(document_id);
         std::vector<const std::string*> words(word_freqs.size());
 
         std::transform(
@@ -166,7 +166,7 @@ void SearchServer::RemoveDocument(ExecutionPolicy&& policy, int document_id) {
         );
 
         std::for_each(policy, words.begin(), words.end(), [this, document_id](const std::string* item) {
-            word_to_document_freqs_.at(std::move(*item)).erase(document_id);
+            word_to_document_freqs_.at(*item).erase(document_id);
             });
 
         document_to_word_freqs_.erase(document_id);
