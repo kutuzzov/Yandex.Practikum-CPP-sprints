@@ -2,13 +2,13 @@
 
 void SearchServer::AddDocument(int document_id, const std::string& document, DocumentStatus status, const std::vector<int>& ratings) {
     if (document_id < 0) {
-        throw std::invalid_argument("документ с отрицательным id"s);
+        throw std::invalid_argument("РґРѕРєСѓРјРµРЅС‚ СЃ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј id"s);
     }
     if (documents_.count(document_id)) {
-        throw std::invalid_argument("документ c id ранее добавленного документа"s);
+        throw std::invalid_argument("РґРѕРєСѓРјРµРЅС‚ c id СЂР°РЅРµРµ РґРѕР±Р°РІР»РµРЅРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р°"s);
     }
     if (!IsValidWord(document)) {
-        throw std::invalid_argument("наличие недопустимых символов"s);
+        throw std::invalid_argument("РЅР°Р»РёС‡РёРµ РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ"s);
     }
 
     const std::vector<std::string> words = SplitIntoWordsNoStop(document);
@@ -81,17 +81,25 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 }
 
 void SearchServer::RemoveDocument(int document_id) {
-    if (document_to_word_freqs_.count(document_id)) {
-        std::map<std::string, double> search_element = document_to_word_freqs_[document_id];
-
-        for (auto [key_string, value_double] : search_element) {
-            word_to_document_freqs_[key_string].erase(document_id);
-        }
-
-        document_to_word_freqs_.erase(document_id);
-        documents_.erase(document_id);
-        document_ids_.erase(document_id);
+    if (!document_ids_.count(document_id)) {
+        throw std::invalid_argument("Invalid document ID to remove"s);
     }
+
+    document_ids_.erase(document_id);
+
+    if (documents_.count(document_id)) {
+        documents_.erase(document_id);
+    }
+
+    for (auto& element : SearchServer::word_to_document_freqs_) {
+        if (element.second.count(document_id)) {
+            element.second.erase(document_id);
+        }
+    }
+
+    if (document_to_word_freqs_.count(document_id)) {
+        document_to_word_freqs_.erase(document_id);
+    } 
 }
 
 bool SearchServer::IsStopWord(const std::string& word) const {
@@ -109,7 +117,7 @@ std::vector<std::string> SearchServer::SplitIntoWordsNoStop(const std::string& t
     std::vector<std::string> words;
     for (const std::string& word : SplitIntoWords(text)) {
         if (!IsValidWord(word)) {
-            throw std::invalid_argument("наличие недопустимых символов"s);
+            throw std::invalid_argument("РЅР°Р»РёС‡РёРµ РЅРµРґРѕРїСѓСЃС‚РёРјС‹С… СЃРёРјРІРѕР»РѕРІ"s);
         }
         if (!IsStopWord(word)) {
             words.push_back(word);
@@ -133,7 +141,7 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(std::string text) const {
     QueryWord result;
 
     if (text.empty()) {
-        throw std::invalid_argument("отсутствие текста после символа «минус» в поисковом запросе"s);
+        throw std::invalid_argument("РѕС‚СЃСѓС‚СЃС‚РІРёРµ С‚РµРєСЃС‚Р° РїРѕСЃР»Рµ СЃРёРјРІРѕР»Р° В«РјРёРЅСѓСЃВ» РІ РїРѕРёСЃРєРѕРІРѕРј Р·Р°РїСЂРѕСЃРµ"s);
     }
     bool is_minus = false;
     if (text[0] == '-') {
@@ -141,7 +149,7 @@ SearchServer::QueryWord SearchServer::ParseQueryWord(std::string text) const {
         text = text.substr(1);
     }
     if (text.empty() || text[0] == '-' || !IsValidWord(text)) {
-        throw std::invalid_argument("наличие более чем одного минуса перед словами"s);
+        throw std::invalid_argument("РЅР°Р»РёС‡РёРµ Р±РѕР»РµРµ С‡РµРј РѕРґРЅРѕРіРѕ РјРёРЅСѓСЃР° РїРµСЂРµРґ СЃР»РѕРІР°РјРё"s);
     }
 
     return { text, is_minus, IsStopWord(text) };
