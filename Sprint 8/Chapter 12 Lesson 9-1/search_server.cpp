@@ -81,6 +81,10 @@ const std::map<std::string, double>& SearchServer::GetWordFrequencies(int docume
 }
 
 void SearchServer::RemoveDocument(int document_id) {
+    return RemoveDocument(std::execution::seq, document_id);
+}
+
+void SearchServer::RemoveDocument(const std::execution::sequenced_policy&, int document_id) {
     if (!document_ids_.count(document_id)) {
         throw std::invalid_argument("Invalid document ID to remove"s);
     }
@@ -99,7 +103,27 @@ void SearchServer::RemoveDocument(int document_id) {
 
     if (document_to_word_freqs_.count(document_id)) {
         document_to_word_freqs_.erase(document_id);
-    } 
+    }
+}
+
+void SearchServer::RemoveDocument(const std::execution::parallel_policy&, int document_id) {
+    if (!document_ids_.count(document_id)) {
+        throw std::invalid_argument("Invalid document ID to remove"s);
+    }
+
+    std::map<std::string, double> word_freqs = document_to_word_freqs_.at(document_id);
+    std::vector<const std::string*> words_to_erase(word_freqs.size());
+
+    std::transform(std::execution::par, word_freqs.begin(), word_freqs.end(),
+        words_to_erase.begin(),
+        [](const auto& words_freq) { return &words_freq.first; });
+
+    std::for_each(std::execution::par, words_to_erase.begin(), words_to_erase.end(),
+        [this, document_id](const auto& word) {word_to_document_freqs_.at(*word).erase(document_id); });
+
+    documents_.erase(document_id);
+    document_ids_.erase(document_id);
+    document_to_word_freqs_.erase(document_id);
 }
 
 bool SearchServer::IsStopWord(const std::string& word) const {
