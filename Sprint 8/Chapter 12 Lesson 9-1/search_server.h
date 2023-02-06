@@ -46,9 +46,8 @@ public:
     const std::map<std::string, double>& GetWordFrequencies(int document_id) const;
 
     void RemoveDocument(int document_id);
-
-    template<typename ExecutionPolicy>
-    void RemoveDocument(ExecutionPolicy&& policy, int document_id);
+    void RemoveDocument(const std::execution::sequenced_policy&, int document_id);
+    void RemoveDocument(const std::execution::parallel_policy&, int document_id);
 
 private:
     struct DocumentData {
@@ -149,25 +148,4 @@ std::vector<Document> SearchServer::FindAllDocuments(const Query& query, Documen
         matched_documents.push_back({ document_id, relevance, documents_.at(document_id).rating });
     }
     return matched_documents;
-}
-
-template<typename ExecutionPolicy>
-void SearchServer::RemoveDocument(ExecutionPolicy&& policy, int document_id) {
-    if (!document_ids_.count(document_id)) {
-        throw std::invalid_argument("Invalid document ID to remove"s);
-    }
-
-    std::map<std::string, double> word_freqs = document_to_word_freqs_.at(document_id);
-    std::vector<const std::string*> words_to_erase(word_freqs.size());
-
-    std::transform(policy, word_freqs.begin(), word_freqs.end(),
-        words_to_erase.begin(),
-        [](const auto& words_freq) { return &words_freq.first; });
-
-    std::for_each(policy, words_to_erase.begin(), words_to_erase.end(),
-        [this, document_id](const auto& word) {word_to_document_freqs_.at(*word).erase(document_id); });
-
-    documents_.erase(document_id);
-    document_ids_.erase(document_id);
-    document_to_word_freqs_.erase(document_id);
 }
