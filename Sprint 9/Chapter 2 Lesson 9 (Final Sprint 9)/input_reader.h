@@ -6,14 +6,10 @@
 
 namespace transport {
 
-void FillCatalogue(Catalogue& catalogue);
+void FillCatalogue(std::istream& in, Catalogue& catalogue);
 
-namespace detail {
-
-Bus FillRoute(std::string& line);
-Stop FillStop(std::string& line);
+std::pair<std::string, geo::Coordinates> FillStop(std::string& line);
 void FillStopDistances(std::string& line, Catalogue& catalogue);
-
-} // namespace detail
+std::tuple<std::string, std::vector<const Stop*>, bool> FillRoute(std::string& line, transport::Catalogue& catalogue);
 
 } // namespace transport
