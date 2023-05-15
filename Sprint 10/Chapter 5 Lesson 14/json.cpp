@@ -385,7 +385,7 @@ void PrintValue(Array array, const PrintContext& ctx) {
     bool first = true;
     for (const auto& elem : array) {
         if (first) first = false;
-        else ctx.out << ","s;
+        else ctx.out << ",\n"s;
         inner_ctx.PrintIndent();
         PrintNode(elem, inner_ctx);
     }
