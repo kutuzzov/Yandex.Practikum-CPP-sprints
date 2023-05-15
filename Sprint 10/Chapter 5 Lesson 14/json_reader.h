@@ -18,13 +18,14 @@ public:
 
     const json::Node& GetBaseRequests() const;
     const json::Node& GetStatRequests() const;
-    
+
     void FillCatalogue(transport::Catalogue& catalogue);
-    
+
 private:
     json::Document input_;
     json::Node dummy_ = nullptr;
-    
-    transport::Bus FillRoute(const json::Dict& request_map) const;
-    transport::Stop FillStop(const json::Dict& request_map) const;
+
+    std::tuple<std::string_view, geo::Coordinates, std::map<std::string_view, int>> FillStop(const json::Dict& request_map) const;
+    void FillStopDistances(transport::Catalogue& catalogue) const;
+    std::tuple<std::string_view, std::vector<const transport::Stop*>, bool> FillRoute(const json::Dict& request_map, transport::Catalogue& catalogue) const;
 };

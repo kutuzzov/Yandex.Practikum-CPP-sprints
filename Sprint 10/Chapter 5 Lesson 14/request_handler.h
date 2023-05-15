@@ -9,30 +9,30 @@
  * можете оставить его пустым.
  */
 
-// Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а
-// с другими подсистемами приложения.
-// См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
-/*
-class RequestHandler {
-public:
-    // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(const TransportCatalogue& db, const renderer::MapRenderer& renderer);
+ // Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а
+ // с другими подсистемами приложения.
+ // См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
+ /*
+ class RequestHandler {
+ public:
+     // MapRenderer понадобится в следующей части итогового проекта
+     RequestHandler(const TransportCatalogue& db, const renderer::MapRenderer& renderer);
 
-    // Возвращает информацию о маршруте (запрос Bus)
-    std::optional<BusStat> GetBusStat(const std::string_view& bus_name) const;
+     // Возвращает информацию о маршруте (запрос Bus)
+     std::optional<BusStat> GetBusStat(const std::string_view& bus_name) const;
 
-    // Возвращает маршруты, проходящие через
-    const std::unordered_set<BusPtr>* GetBusesByStop(const std::string_view& stop_name) const;
+     // Возвращает маршруты, проходящие через
+     const std::unordered_set<BusPtr>* GetBusesByStop(const std::string_view& stop_name) const;
 
-    // Этот метод будет нужен в следующей части итогового проекта
-    svg::Document RenderMap() const;
+     // Этот метод будет нужен в следующей части итогового проекта
+     svg::Document RenderMap() const;
 
-private:
-    // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
-    const TransportCatalogue& db_;
-    const renderer::MapRenderer& renderer_;
-};
-*/
+ private:
+     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
+     const TransportCatalogue& db_;
+     const renderer::MapRenderer& renderer_;
+ };
+ */
 
 #pragma once
 
@@ -48,15 +48,15 @@ public:
     {
         ProcessRequests();
     }
-    
-    const transport::BusInfo GetBusStat(const std::string& route_number) const;
-    const std::set<std::string> GetBusesByStop(const std::string& stop_name) const;
-    
-    const json::Node PrintStop(const json::Dict& request_map) const;
-    const json::Node PrintRoute(const json::Dict& request_map) const;
-    
+
     void ProcessRequests() const;
     
+    const json::Node PrintRoute(const json::Dict& request_map) const;
+    const json::Node PrintStop(const json::Dict& request_map) const;
+    
+    std::optional<transport::BusStat> GetBusStat(const std::string_view& bus_number) const;
+    const std::set<std::string> GetBusesByStop(std::string_view stop_name) const;
+
 private:
     const JsonReader& requests_;
     const transport::Catalogue& catalogue_;

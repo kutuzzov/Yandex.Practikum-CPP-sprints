@@ -21,20 +21,19 @@
 
 namespace transport {
 
-struct Bus {
-    std::string number;
-    std::vector<std::string> stops;
-    bool circular_route;
-};
-
 struct Stop {
     std::string name;
     geo::Coordinates coordinates;
-    std::set<std::string> buses;
-    std::unordered_map<std::string, int> stop_distances;
+    std::set<std::string> buses_by_stop;
 };
 
-struct BusInfo {
+struct Bus {
+    std::string number;
+    std::vector<const Stop*> stops;
+    bool is_circle;
+};
+
+struct BusStat {
     size_t stops_count;
     size_t unique_stops_count;
     double route_length;

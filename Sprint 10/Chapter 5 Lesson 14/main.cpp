@@ -12,7 +12,11 @@
 #include "request_handler.h"
 
 int main() {
-    setlocale(LC_ALL, "Russian");
+#ifdef __APPLE__
+    freopen("input.json", "r", stdin);
+    //freopen("output.json", "w", stdout);
+    //freopen("error-output.txt", "w", stderr);
+#endif
 
     transport::Catalogue catalogue;
     JsonReader requests(std::cin);
@@ -49,22 +53,33 @@ int main() {
     { "id": 2, "type": "Bus", "name": "114" }
     ]
 }
---------------------------
-Ожидаемый вывод:
-[
-   {
-       "buses": [
-           "114"
-       ],
-       "request_id": 1
-   },
-   {
-       "curvature": 1.23199,
-       "request_id": 2,
-       "route_length": 1700,
-       "stop_count": 3,
-       "unique_stop_count": 2
-   }
-]
---------------------------
-*/
+ */
+/*
+ Ожидаемый вывод:
+
+ [
+     {
+         "buses": [
+             "114"
+         ],
+         "request_id": 1
+     },
+     {
+         "curvature": 1.23199,
+         "request_id": 2,
+         "route_length": 1700,
+         "stop_count": 3,
+         "unique_stop_count": 2
+     }
+ ]
+--------------------------------------
+ 
+ Bus 256: 6 stops on route, 5 unique stops, 5950 route length, 1.36124 curvature
+ Bus 750: 7 stops on route, 3 unique stops, 27400 route length, 1.30853 curvature
+ Bus 751: not found
+ Stop Samara: not found
+ Stop Prazhskaya: no buses
+ Stop Biryulyovo Zapadnoye: buses 256 828
+ 
+ 
+ */

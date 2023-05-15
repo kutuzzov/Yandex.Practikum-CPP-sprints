@@ -385,7 +385,7 @@ void PrintValue(Array array, const PrintContext& ctx) {
     bool first = true;
     for (const auto& elem : array) {
         if (first) first = false;
-        else ctx.out << ",\n"s;
+        else ctx.out << ","s;
         inner_ctx.PrintIndent();
         PrintNode(elem, inner_ctx);
     }
@@ -413,7 +413,7 @@ void PrintValue(Dict dict, const PrintContext& ctx) {
 
 void PrintNode(const Node& node, const PrintContext& ctx) {
     std::visit(
-        [&ctx](const auto& value){ PrintValue(value, ctx); },
+        [&ctx](const auto& value) { PrintValue(value, ctx); },
         node.GetValue());
 }
 
