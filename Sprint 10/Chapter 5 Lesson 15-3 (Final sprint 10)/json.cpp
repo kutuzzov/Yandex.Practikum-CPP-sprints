@@ -226,34 +226,6 @@ Node LoadNode(istream& input) {
 
 }  // namespace
 
-Node::Node(std::nullptr_t)
-    : value_(nullptr) {
-}
-
-Node::Node(std::string value)
-    : value_(std::move(value)) {
-}
-
-Node::Node(int value)
-    : value_(value) {
-}
-
-Node::Node(double value)
-    : value_(value) {
-}
-
-Node::Node(bool value)
-    : value_(value) {
-}
-
-Node::Node(Array array)
-    : value_(std::move(array)) {
-}
-
-Node::Node(Dict map)
-    : value_(std::move(map)) {
-}
-
 bool Node::IsInt() const {
     return holds_alternative<int>(value_);
 }

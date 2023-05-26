@@ -25,14 +25,14 @@ class Node {
 public:
     using Value = std::variant<std::nullptr_t, std::string, int, double, bool, Array, Dict>;
 
-    Node() = default;
-    Node(std::nullptr_t);
-    Node(std::string value);
-    Node(int value);
-    Node(double value);
-    Node(bool value);
-    Node(Array array);
-    Node(Dict map);
+    template<typename ValueType>
+    Node(ValueType value)
+        : value_(value)
+    {}
+    
+    Node()
+        : value_(nullptr)
+    {}
 
     bool IsInt() const;
     bool IsDouble() const;

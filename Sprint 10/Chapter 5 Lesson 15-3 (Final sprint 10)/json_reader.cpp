@@ -1,8 +1,3 @@
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
- */
-
 #include "json_reader.h"
 
 const json::Node& JsonReader::GetBaseRequests() const {
@@ -18,6 +13,19 @@ const json::Node& JsonReader::GetStatRequests() const {
 const json::Node& JsonReader::GetRenderSettings() const {
     if (!input_.GetRoot().AsMap().count("render_settings")) return dummy_;
     return input_.GetRoot().AsMap().at("render_settings");
+}
+
+void JsonReader::ProcessRequests(const json::Node& stat_requests, RequestHandler& rh) const {
+    json::Array result;
+    for (auto& request : stat_requests.AsArray()) {
+        const auto& request_map = request.AsMap();
+        const auto& type = request_map.at("type").AsString();
+        if (type == "Stop") result.push_back(PrintStop(request_map, rh).AsMap());
+        if (type == "Bus") result.push_back(PrintRoute(request_map, rh).AsMap());
+        if (type == "Map") result.push_back(PrintMap(request_map, rh).AsMap());
+    }
+
+    json::Print(json::Document{ result }, std::cout);
 }
 
 void JsonReader::FillCatalogue(transport::Catalogue& catalogue) {
@@ -122,4 +130,50 @@ renderer::MapRenderer JsonReader::FillRenderSettings(const json::Dict& request_m
     }
     
     return render_settings;
+}
+
+const json::Node JsonReader::PrintRoute(const json::Dict& request_map, RequestHandler& rh) const {
+    json::Dict result;
+    const std::string& route_number = request_map.at("name").AsString();
+    result["request_id"] = request_map.at("id").AsInt();
+    if (!rh.IsBusNumber(route_number)) {
+        result["error_message"] = json::Node{ static_cast<std::string>("not found") };
+    }
+    else {
+        result["curvature"] = rh.GetBusStat(route_number)->curvature;
+        result["route_length"] = rh.GetBusStat(route_number)->route_length;
+        result["stop_count"] = static_cast<int>(rh.GetBusStat(route_number)->stops_count);
+        result["unique_stop_count"] = static_cast<int>(rh.GetBusStat(route_number)->unique_stops_count);
+    }
+
+    return json::Node{ result };
+}
+
+const json::Node JsonReader::PrintStop(const json::Dict& request_map, RequestHandler& rh) const {
+    json::Dict result;
+    const std::string& stop_name = request_map.at("name").AsString();
+    result["request_id"] = request_map.at("id").AsInt();
+    if (!rh.IsStopName(stop_name)) {
+        result["error_message"] = json::Node{ static_cast<std::string>("not found") };
+    }
+    else {
+        json::Array buses;
+        for (auto& bus : rh.GetBusesByStop(stop_name)) {
+            buses.push_back(bus);
+        }
+        result["buses"] = buses;
+    }
+
+    return json::Node{ result };
+}
+
+const json::Node JsonReader::PrintMap(const json::Dict& request_map, RequestHandler& rh) const {
+    json::Dict result;
+    result["request_id"] = request_map.at("id").AsInt();
+    std::ostringstream strm;
+    svg::Document map = rh.RenderMap();
+    map.Render(strm);
+    result["map"] = strm.str();
+
+    return json::Node{ result };
 }
