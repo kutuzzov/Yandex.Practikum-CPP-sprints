@@ -1,7 +1,6 @@
 #include "json_builder.h"
 #include <iostream>
 
-
 using namespace std;
 
 int main() {
@@ -29,7 +28,9 @@ int main() {
 
     json::Print(
         json::Document{
-            json::Builder{}.Value("s"s).Value("1"s).Build()
+            json::Builder{}
+            .Value("just a string"s)
+            .Build()
         },
         cout
     );
