@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string_view>
+#include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,12 +18,7 @@ const string_view PLANETS[] = {
 // clang-format on
 
 bool IsPlanet(string_view name) {
-    for (int i = 0; i < NUM_PLANETS; ++i) {
-        if (PLANETS[i] == name) {
-            return true;
-        }
-    }
-    return false;
+    return count(begin(PLANETS), end(PLANETS), name);
 }
 
 void Test(string_view name) {
