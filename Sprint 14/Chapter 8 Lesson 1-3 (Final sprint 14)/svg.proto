@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto_map;
+
+message Rgb {
+	int32 red = 1;
+	int32 green = 2;
+	int32 blue = 3;
+}
+
+message Rgba {
+	int32 red = 1;
+	int32 green = 2;
+	int32 blue = 3;
+	double opacity = 4;
+}
+
+message Color {
+	string name = 1;
+	Rgb rgb = 2;
+	Rgba rgba = 3;
+}
+
+message Point {
+	double x = 1;
+        double y = 2;
+}

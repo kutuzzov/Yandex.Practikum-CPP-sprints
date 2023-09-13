@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package proto_graph;
+
+message Edge {
+    string name = 1;
+    int32 quality = 2;
+    int32 from = 3;
+    int32 to = 4;
+    double weight = 5;
+}
+
+message Vertex {
+    repeated int32 edge_id = 1;
+}
+
+message Graph {
+    repeated Edge edge = 1;
+    repeated Vertex vertex = 2;
+}
